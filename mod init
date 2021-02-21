@@ -1,0 +1,46 @@
+public class SurvivalEssentials implements ModInitializer {
+    public static final String MOD_ID = "novesues";
+    
+    //apple tree blocks
+    public static final Block APPLE_LEAVES = new AppleLeavesBlock(FabricBlockSettings.of(Material.LEAVES)
+            .breakByHand(true)
+            .sounds(BlockSoundGroup.GRASS)
+            .strength(1, 0.6f));
+
+    public static final Block APPLE_LOG = new AppleLogBlock(FabricBlockSettings.of(Material.WOOD)
+            .breakByHand(true)
+            .sounds(BlockSoundGroup.WOOD)
+            .strength(3, 3.0f));
+            
+    //features
+    //apple tree gen
+    private static final Feature<DefaultFeatureConfig> OVERWORLD_APPLE_TREE_FEATURE = new AppleTreeFeature(DefaultFeatureConfig.CODEC);
+
+    public static final ConfiguredFeature<?, ?> OVERWORLD_APPLE_TREE_FEATURE_CONFIGURED = OVERWORLD_APPLE_TREE_FEATURE.configure(FeatureConfig.DEFAULT)
+            .decorate(ConfiguredFeatures.Decorators.TOP_SOLID_HEIGHTMAP.spreadHorizontally())
+            .decorate(Decorator.COUNT_NOISE_BIASED.configure(new CountNoiseBiasedDecoratorConfig(40, 40.0D, 0.0D)));
+            
+    @Override
+    public void onInitialize() {
+        System.out.println("main mod initialization loaded fine™️");
+        
+        
+        //trees
+        //Apple Tree Blocks
+        //Leaves
+        Registry.register(Registry.BLOCK, new Identifier(MOD_ID, "apple_leaves"), APPLE_LEAVES);
+        Registry.register(Registry.ITEM, new Identifier(MOD_ID, "apple_leaves"), new BlockItem(APPLE_LEAVES, new Item.Settings().group(ItemGroup.DECORATIONS)));
+        //Logs
+        Registry.register(Registry.BLOCK, new Identifier(MOD_ID, "apple_log"), APPLE_LOG);
+        Registry.register(Registry.ITEM, new Identifier(MOD_ID, "apple_log"), new BlockItem(APPLE_LOG, new Item.Settings().group(ItemGroup.BUILDING_BLOCKS)));
+        
+        //Feature Generation
+        //apple tree gen
+        RegistryKey<ConfiguredFeature<?, ?>> appletreeFeatureOverworld = RegistryKey.of(Registry.CONFIGURED_FEATURE_WORLDGEN,
+                new Identifier(MOD_ID, "overworld_apple_tree_feature"));
+        Registry.register(BuiltinRegistries.CONFIGURED_FEATURE, appletreeFeatureOverworld.getValue(), OVERWORLD_APPLE_TREE_FEATURE_CONFIGURED);
+        //noinspection deprecation
+        BiomeModifications.addFeature(BiomeSelectors.includeByKey(SWAMP, SWAMP_HILLS, JUNGLE, JUNGLE_HILLS, BAMBOO_JUNGLE_HILLS, BAMBOO_JUNGLE, MUSHROOM_FIELDS, MUSHROOM_FIELD_SHORE), GenerationStep.Feature.TOP_LAYER_MODIFICATION, appletreeFeatureOverworld);
+        Registry.register(Registry.FEATURE, new Identifier(MOD_ID, "overworld_apple_tree_feature"), OVERWORLD_APPLE_TREE_FEATURE);
+        }
+    }
